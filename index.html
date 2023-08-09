@@ -1,0 +1,3105 @@
+<html>
+
+<head>
+    <title>Game</title>
+    <script type="text/javascript" src="js/libs/jquery/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="js/libs/jquery/three2.js"></script>
+    <script type="text/javascript" src="js/libs/three/three.js"></script>
+    <script type="text/javascript" src="js/libs/three/MTLLoader.js"></script>
+    <script type="text/javascript" src="js/libs/three/OBJLoader.js"></script>
+    <script type="text/javascript" src="js/libs/jquery/FBXLoader.js"></script>
+    <script type="text/javascript" src="js/libs/jquery/inflate.min.js"></script>
+    <script type="text/javascript" src="js/libs/mifacebook.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <style>
+        #bar-section {
+            height: 5%;
+            width: 99.7%;
+            background-color: rgb(243, 181, 181);
+        }
+
+        #bar-imagenes {
+            height: 90%;
+            width: 2%;
+        }
+
+        #bar-imagenes-menu {
+            float: right;
+            height: 90%;
+            width: 7%;
+        }
+
+        #bar-label {
+            font-size: 200%;
+            color: white;
+        }
+
+        #bar-label-points {
+            font-size: 200%;
+            color: white;
+        }
+
+        #bar-label-life {
+            font-size: 200%;
+            color: white;
+        }
+
+        #menu-principal {
+            height: 100%;
+            width: 100%;
+        }
+
+        #menu-principal-background {
+            height: 100%;
+            width: 100%;
+        }
+
+        .btnOrder-1 {
+            position: absolute;
+            top: 45%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+            height: 15%;
+            width: 25%;
+        }
+
+        .btnOrder-2 {
+            position: absolute;
+            top: 60%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+            height: 15%;
+            width: 25%;
+        }
+
+        .btnOrder-3 {
+            position: absolute;
+            top: 75%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+            height: 15%;
+            width: 25%;
+        }
+
+        .btnOrder-4 {
+            position: absolute;
+            top: 80%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: 15%;
+            width: 25%;
+        }
+
+        .btn-score {
+            font-family: 'Nominal BRK';
+            font-size: medium;
+        }
+        
+        .options-txt {
+            font-family: 'Nominal BRK';
+            font-size: x-large;
+            color: white;
+        }
+
+        .btn-score, input[type="text"] {
+            color: black;
+        }
+
+        /* Slider */ 
+            .container-slider {
+                max-width: 450px;
+                overflow: hidden;
+            }
+
+            :root {
+                --tracker-color: black;
+            }
+
+            .range-1 {
+                --thumb-color: #ef3e36;
+                --thumb-behind-color: #FDB89F;
+            }
+
+            .range-2 {
+                --thumb-color: #17BEBB;
+                --thumb-behind-color: #83F9F8;
+            }
+
+            .range-3 {
+                --thumb-color: #f28123;
+                --thumb-behind-color: #fbc466;
+            }
+
+            input[type="range"] {
+                -webkit-appearance: none;
+                background: none;
+                width: 100%;
+            }
+
+            input[type="range"]:focus {
+                outline: none;
+            }
+            
+            input[type="range"]::-webkit-slider-runnable-track {
+                width: 100%;
+                cursor: pointer;
+                border: 1px solid var(--tracker-color);
+                overflow: hidden;
+            }
+
+            input[type="range"]::-webkit-slider-thumb {
+                height: 12px;
+                width: 45px;
+                cursor: pointer;
+                -webkit-appearance: none;
+                border-bottom: 1px solid var(--thumb-color);
+                box-shadow: 0 0 0 var(--thumb-behind-color), -40px 0 0 var(--thumb-behind-color), -85px 0 0 var(--thumb-behind-color), -130px 0 0 var(--thumb-behind-color),
+                    -175px 0 0 var(--thumb-behind-color), -220px 0 0 var(--thumb-behind-color), -265px 0 0 var(--thumb-behind-color), -310px 0 0 var(--thumb-behind-color),
+                    -350px 0 0 var(--thumb-behind-color), -390px 0 0 var(--thumb-behind-color), -409px 0 0 var(--thumb-behind-color);
+                background: var(--thumb-color);
+            }
+        /* - - - - - - */
+
+    </style>
+
+    <script type="text/javascript">
+        /*#TO-DO:   
+        */
+
+        var scene;
+        var cameraP1;
+        var cameraP2;
+        var visibleSize;
+        var listener = new THREE.AudioListener();
+
+        var movimientocamara = {
+            Movimx: 0,
+            Movimy: 0,
+            Movimz: 0,
+
+            fov_v: 0,
+            near_v: 0,
+            far_v: 0
+        };
+
+        const enemyStates = {
+            WAIT: "wait",
+            PATROL: "patrol",
+        }
+
+        const GameModes = {
+            ESCAPE: 0,
+            ELIMINATION: 1,
+        }
+
+        const GameDifficulty = {
+            NORMAL: 0,
+            HEROIC: 1,
+        }
+
+        var enemyRays = [
+            new THREE.Vector3(0, 0, 1),     //Abajo     -   0
+            new THREE.Vector3(0, 0, -1),    //Arriba    -   1
+            new THREE.Vector3(1, 0, 0),     //Derecha   -   2
+            new THREE.Vector3(-1, 0, 0),    //Izquierda -   3
+        ]
+
+        var visibleSize = {
+            width: 0,
+            height: 0
+        };
+
+        var patrolPoints = [];
+
+        var worldScore = 600;
+
+        var renderer;
+        var controls;
+        var objects = [];
+        var clock;
+        var deltaTime;
+        var keys = {};
+        var personaje1;
+        var personaje2;
+
+        var enemigo1;
+        var TMP_float = 0;
+
+        var ciclo_vigilancia1 = true;
+        var levitacion = true;
+
+        var gameState = "Jugando";
+        var Level1;
+        var Level2;
+        var Level3;
+        var levels = [Level1, Level2, Level3];
+        var currentLevel = 0;
+
+        var currentUser = {
+            username: "",
+            score: 0
+        }
+
+        var colliders = [];
+        var enemies = [];
+        var players = [];
+        var highscores = [];
+        var rayCaster;
+
+        var isMultiplayer = false;
+        var gameMode = GameModes.ESCAPE;
+        var gameDifficulty = GameDifficulty.NORMAL;
+
+        var loadingScreen = false;
+
+        var isPaused = false;
+        var pauseScreen = false;
+        var showingScore = false;
+        var pauseCooldown = 0;
+        var maxPauseCooldown = 60;
+
+        //volumen de la app
+
+        var volumenGlobal = 1;
+        var volumenMusica = 0;
+        var volumenEfectos = 1;
+
+        var isWorldReady = [];
+        var worldObjects = 0;
+
+        var paramsInicialesCargados = false;
+        var paramsEnemigosCargados = false;
+
+        var items = []; // Invisibilidad, Stop Watch, Intangibilidad
+
+        $(document).ready(function () {
+            menu();
+
+            /*
+                const fbxLoader = new FBXLoader()
+                fbxLoader.load(
+                'assets\Personaje_principal\Personaje1_Ciclo_Caminado.fbx',
+                (object) => {
+                //  object.traverse(function (child) {
+                //        if ((child as THREE.Mesh).isMesh) {
+                //             // (child as THREE.Mesh).material = material
+                //             if ((child as THREE.Mesh).material) {
+                //               ((child as THREE.Mesh).material as THREE.MeshBasicMaterial).transparent = false
+                //          }
+                //       }
+                //  })
+                //  object.scale.set(.01, .01, .01)
+                    scene.add(object)
+                },
+                (xhr) => {
+                    console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+                },
+                    (error) => {
+                    console.log(error)
+                }
+                )
+            
+                
+                var loader = new FBXLoader();
+                loader.load('./assets/Personaje_principal/Personaje1_Ciclo_Caminado.fbx', (personaje1) => {
+                    var mixers = []; 
+        
+                    mixers.push(personaje1.mixer); 
+                    var action = personaje1.mixer.clipAction(personaje1.animations[0]); 
+                    action.play(); 
+                    
+                    personaje.position.z = 0; 
+                    personaje.position.x = -1; 
+                    personaje.position.y = 1.5; 
+                    personaje.scale.set(1, 1, 1); 
+                    personaje.rotation.y = THREE.Math.degToRad(180); 
+                    
+                    
+                    persona.position.set(personaje.position.x,2,personaje.position.z); 
+                    
+                    personaje1.traverse(function (child) { 
+                        if (child.isMesh) { 
+                            child.castShadow = true; 
+                            child.receiveShadow = true; 
+                        } 
+                    }); 
+                });
+                                
+            */
+
+        });
+
+        function startGame() {
+            
+            $("#audioTheme")[0].play();
+            $("#audioTheme").prop("loop", true);
+            $('#audioTheme').prop("volume", volumenGlobal * volumenMusica);
+
+            setupScene();
+            models();
+            render();
+
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+        }
+
+        function loadOBJWithMTL(path, objFile, mtlFile, onLoadCallback) {
+
+            var mtlLoader = new THREE.MTLLoader();
+            mtlLoader.setPath(path);
+            mtlLoader.load(mtlFile, (materials) => {
+
+                var objLoader = new THREE.OBJLoader();
+                objLoader.setMaterials(materials);
+                objLoader.setPath(path);
+                objLoader.load(objFile, (object) => {
+                    onLoadCallback(object);
+                });
+
+            });
+
+        }
+
+        function onKeyDown(event) {
+            keys[String.fromCharCode(event.keyCode)] = true;
+        }
+
+        function onKeyUp(event) {
+            keys[String.fromCharCode(event.keyCode)] = false;
+        }
+
+        function render() {
+            requestAnimationFrame(render);
+            deltaTime = clock.getDelta();
+            if (IsWorldReady() && gameState != "Ganaste") {
+
+                if (!isPaused) {
+
+                    if (pauseScreen) {
+                        pauseScreen = false;
+                        $("#scene-section").css("display","block");
+                        $("#pause-screen").css("display","none");
+                        $("#options-screen").css("display","none");
+                    }
+
+                    if (loadingScreen) {
+                        loadingScreen = false;
+                        $("#scene-section").css("display","block");
+                        $("#loading-screen").css("display","none");
+                    }
+
+                    if (!paramsInicialesCargados) {
+                        paramsIniticials();
+                    }
+
+                    if(!paramsEnemigosCargados) {
+                        paramsEnemigos();
+                    }
+
+                    //var enemy1 = scene.getObjectByName("enemigo1");
+
+                    var yaw = 0;
+                    var forward = 0;
+
+                    // Movimiento Jugador 1
+                    moveForwardP1();
+                    moveSidewayP1();
+                    useItem();
+
+                    if (isMultiplayer) {
+                        // Movimiento Jugador 1
+                        moveForwardP2();
+                        moveSidewayP2();
+                    }
+
+                    // ¿Se está usando un Item?
+                    handleItems();
+
+                    // Colisiones
+                    collisionObjects();
+
+                    robotAI();
+
+                    enemies.forEach(Enemy => {
+                        Enemy.position.y += Math.sin(TMP_float) * 0.25;
+                    });
+                    TMP_float += 0.05;
+                    
+                    conditionsToWin();
+                    //$("#player-zcoords").text("Z: " + personaje1.position.z);
+
+                                        
+                    var left,bottom,width,height;
+                    var i = 0;
+
+                    updateSize();
+
+                    players.forEach(Player => {
+                        //#region Cameras control
+                            height = 1;
+                            bottom = 0;
+
+                            renderer.setClearColor(new THREE.Color(0, 0, 0));
+                            renderer.setScissor(1700,0,visibleSize.width, visibleSize.height);
+
+                            if (!isMultiplayer) {
+                                width = 1;
+                            } else {
+                                width = 0.5;
+                            }
+
+                            if (i == 0) {
+                                left = 0;
+                            } else {
+                                left = 0.5;
+                            }
+
+                            const cleft = Math.floor( visibleSize.width * left );
+                            const cbottom = Math.floor( visibleSize.height * bottom );
+                            const cwidth = Math.floor( visibleSize.width * width );
+                            const cheight = Math.floor( visibleSize.height * height );
+
+                            renderer.setViewport( cleft, cbottom, cwidth, cheight );
+                            renderer.setScissor( cleft, cbottom, cwidth, cheight );
+                            renderer.setScissorTest( true );
+                            renderer.setClearColor( 0x000000 );
+
+                            renderer.render(scene, Player.camera);
+                            i++;
+                        //#endregion
+                        
+                        //#region Score Control
+                            if (gameState != "Ganaste") {
+                                var dt = Math.ceil(1 * deltaTime);
+
+                                Player.puntuacion += (dt/100);
+                            } else {
+                                Player.puntuacion = (worldScore / Player.puntuacion) * ((Player.eliminaciones+1) * 1.5) * 100 ;
+                                $("#txt-user-score").css("display","inline");
+                                $("#user-score").css("display","block");
+                                $("#btn-send-score").css("display","block");
+                            }
+
+                        //#endregion
+                    })
+
+                    /*$("#player1-score").text("Player 1: " + Math.floor(personaje1.puntuacion));
+                    if (isMultiplayer) {
+                        $("#player2-score").text("Player 2: " + Math.floor(personaje2.puntuacion));
+                    }*/
+
+                    if(keys["X"]) {
+                        pasarNivel();
+                    }
+
+                } else {
+
+                    // It's PUASED
+                    if (!pauseScreen) {
+
+                        pauseScreen = true;
+                        var canvas = $("#scene-section canvas:first-child");
+                        $("#scene-section").css("display","none");
+                        var h = canvas[0].height;
+                        var w = canvas[0].width;
+                        canvas[0].id = "canvas-game";
+                        var hcss = $("#canvas-game").css("height");
+                        var wcss = $("#canvas-game").css("width");
+
+                        $("#pause-screen").css("display","block");
+                        $("#pause-image").height = h;
+                        $("#pause-image").width = w;
+                        $("#pause-image").css({"height" : hcss, "width" : wcss});
+
+                    }
+
+                    $("#btnOptions").on("click", function () {
+                        $("#sfxClick").prop("loop", false);
+                        $('#sfxClick').prop("volume", volumenGlobal * volumenEfectos);
+                        $("#sfxClick")[0].play();
+
+                        menuOpciones();
+                    });
+
+                    handleVolumes();
+
+                } 
+
+                if (keys["P"] && pauseCooldown > maxPauseCooldown) {
+                    pauseCooldown = 0;
+                    isPaused = !isPaused;
+                } else {
+                    pauseCooldown = Math.min(pauseCooldown+1, maxPauseCooldown+1);
+                }
+
+            }
+            else if (gameState != "Ganaste") {
+
+                if (!loadingScreen) {
+                    loadingScreen = true;
+                    var canvas = $("#scene-section canvas:first-child");
+                    $("#scene-section").css("display","none");
+                    var h = canvas[0].height;
+                    var w = canvas[0].width;
+                    canvas[0].id = "canvas-game";
+                    var hcss = $("#canvas-game").css("height");
+                    var wcss = $("#canvas-game").css("width");
+
+                    $("#loading-screen").css("display","block");
+                    $("#loading-image").height = h;
+                    $("#loading-image").width = w;
+                    $("#loading-image").css({"height" : hcss, "width" : wcss});
+                }
+            } else {
+
+                var canvas = $("#scene-section canvas:first-child");
+                $("#scene-section").css("display","none");
+                var h = canvas[0].height;
+                var w = canvas[0].width;
+                canvas[0].id = "canvas-game";
+                var hcss = $("#canvas-game").css("height");
+                var wcss = $("#canvas-game").css("width");
+
+                $("#score-screen").css("display","block");
+                $("#score-screen").height = h;
+                $("#score-screen").width = w;
+                $("#score-screen").css({"height" : hcss, "width" : wcss});
+
+                if (!showingScore) {
+                    $("#col-usernames").css("display","none");
+                    $("#col-button").css("display","none");
+                    $("#col-scores").css("display","none");
+                }
+
+                if (isMultiplayer) {
+                    if (personaje1.puntuacion > personaje2.puntuacion) {
+                        $("#txt-winner").text("Gana el Jugador 1!");
+                    } else {
+                        $("#txt-winner").text("Gana el Jugador 2!");
+                    }
+                }
+
+                $("#btn-send-score").on("click", function () {
+
+                    if(!showingScore) {
+                        currentUser.username = $("#user-score").val();
+                        $("#txt-winner").text("");
+                        
+                        if (isMultiplayer) {
+                            if (personaje1.puntuacion > personaje2.puntuacion) {
+                                currentUser.score = personaje1.puntuacion;
+                            } else {
+                                currentUser.score = personaje2.puntuacion;
+                            }
+                        } else {
+                            currentUser.score = personaje1.puntuacion;
+                        }
+                        $("#txt-user-score").css("display","none");
+                        $("#user-score").css("display","none");
+                        $("#btn-send-score").css("display","none");
+                    }
+
+                    tablaPuntuaciones();
+
+                });
+
+                $("#btn-share-fb").on("click", function () {
+
+                    shareFB();
+                    //alert(currentUser.username + " : " + currentUser.score);
+                });
+
+            }
+        }
+
+        function updateSize() {
+
+            if ( visibleSize.width != window.innerWidth || visibleSize.height != window.innerHeight ) {
+
+                visibleSize.width  = window.innerWidth;
+                visibleSize.height = window.innerHeight;
+
+                renderer.setSize( visibleSize.width, visibleSize.height );
+
+            }
+
+        }
+
+        function setupScene() {
+
+            if (localStorage.getItem("Highscores") != null) {
+                highscores = JSON.parse(localStorage.getItem("Highscores"));
+                //localStorage.setItem("Highscores", 0);
+            } else {
+                var I = {
+                    username: "",
+                    score: 0
+                }, B = {
+                    username: "",
+                    score: 0
+                }, S = {
+                    username: "",
+                    score: 0
+                };
+
+                I.username = "Ingrid";
+                I.score = 1300;
+                highscores.push(I);
+
+                S.username = "Sau";
+                S.score = 500;
+                highscores.push(S);
+
+                B.username = "Briam";
+                B.score = 250;
+                highscores.push(B);
+            }
+
+            $("#game-diff-menu").remove();
+            $("body").append("<div id='bar-section'></div>");
+            
+            visibleSize = {
+                width: window.innerWidth,
+                height: window.innerHeight
+            };
+
+            rayCaster = new THREE.Raycaster();
+
+            clock = new THREE.Clock();
+            scene = new THREE.Scene();
+
+            cameraP1 = new THREE.PerspectiveCamera(45, visibleSize.width / visibleSize.height, 1, 1000);
+
+            cameraP1.position.z = 50;
+            cameraP1.position.y = 120;
+            cameraP1.rotation.x = -1;
+
+            if (isMultiplayer) {
+                
+                cameraP2 = new THREE.PerspectiveCamera(45, visibleSize.width / visibleSize.height, 1, 1000);
+
+                cameraP2.position.z = 50;
+                cameraP2.position.y = 120;
+                cameraP2.rotation.x = -1;
+
+            }
+
+            renderer = new THREE.WebGLRenderer({
+                precision: "mediump"
+            });
+            renderer.setPixelRatio(visibleSize.width / visibleSize.height);
+            renderer.setSize(visibleSize.width, visibleSize.height);
+
+            var ambientLight = new THREE.AmbientLight(new THREE.Color(0.9, 0.9, 0.9), 1.0);
+            scene.add(ambientLight);
+
+            var directionalLight = new THREE.DirectionalLight(new THREE.Color(1, 1, 0), 0.4);
+            directionalLight.position.set(0, 0, 1);
+            scene.add(directionalLight);
+
+            //Es la barra azul que se encuentra al jugar con sus opciones de si le das click
+            
+            cameraP1.add( listener );
+
+            $("#bar-section").append("<label id='bar-label-points'>0</label><img id='bar-imagenes' src='assets/clock.png'><label id='bar-label'>0:00</label><img id='bar-imagenes' src='assets/lifes.png'><label id='bar-label-life'>" +
+                "0" + "</label><input id='bar-musicVolume'type='range' min='0' max='1' step='0.01'><img id='bar-imagenes-menu' src='assets/menu.png'>");
+
+
+            $("#bar-imagenes-menu").on("click", function () {
+                //$("#audioTheme")[0].play();
+                statusGameEnviroment = 0;
+                location.reload();
+            });
+
+            $("#scene-section").append(renderer.domElement);
+
+        }
+
+        function models() {
+
+            //      Puntos vigilancia
+            {
+                const geometry = new THREE.BoxGeometry( 30, 30, 30 );
+                const material = new THREE.MeshBasicMaterial( {color: 0x00ff00, opacity: 0.0, transparent: true} );
+                const patrol00 = new THREE.Mesh( geometry, material );
+                scene.add( patrol00 );
+                patrol00.position.x = -96;
+                patrol00.position.y = 20;
+                patrol00.position.z = -272;
+                patrol00.name = "patrollPoint";
+
+                var patrol01 = patrol00.clone();
+                patrol01.position.x = -96;
+                patrol01.position.y = 20;
+                patrol01.position.z = -510;
+                patrol01.name = "patrollPoint";
+                scene.add( patrol01 );
+
+                var patrol02 = patrol00.clone();
+                patrol02.position.x = -240;
+                patrol02.position.y = 20;
+                patrol02.position.z = -510;
+                patrol02.name = "patrollPoint";
+                scene.add( patrol02 );
+
+                var patrol03 = patrol00.clone();
+                patrol03.position.x = -240;
+                patrol03.position.y = 20;
+                patrol03.position.z = -655;
+                patrol03.name = "patrollPoint";
+                scene.add( patrol03 );
+
+                var patrol04 = patrol00.clone();
+                patrol04.position.x = 50;
+                patrol04.position.y = 20;
+                patrol04.position.z = -510;
+                patrol04.name = "patrollPoint";
+                scene.add( patrol04 );
+
+                var patrol05 = patrol00.clone();
+                patrol05.position.x = 50;
+                patrol05.position.y = 20;
+                patrol05.position.z = -610;
+                patrol05.name = "patrollPoint";
+                scene.add( patrol05 );
+
+                var patrol06 = patrol00.clone();
+                patrol06.position.x = 190;
+                patrol06.position.y = 20;
+                patrol06.position.z = -510;
+                patrol06.name = "patrollPoint";
+                scene.add( patrol06 );
+
+                var patrol07 = patrol00.clone();
+                patrol07.position.x = 145;
+                patrol07.position.y = 20;
+                patrol07.position.z = -610;
+                patrol07.name = "patrollPoint";
+                scene.add( patrol07 );
+
+                // Seccion Abajo Derecha del Mapa
+                var patrol08 = patrol00.clone();
+                patrol08.position.x = 190;
+                patrol08.position.y = 20;
+                patrol08.position.z = -365;
+                patrol08.name = "patrollPoint";
+                scene.add( patrol08 );
+
+                var patrol09 = patrol00.clone();
+                patrol09.position.x = 190;
+                patrol09.position.y = 20;
+                patrol09.position.z = -175;
+                patrol09.name = "patrollPoint";
+                scene.add( patrol09 );
+
+                var patrol10 = patrol00.clone();
+                patrol10.position.x = 95;
+                patrol10.position.y = 20;
+                patrol10.position.z = -175;
+                patrol10.name = "patrollPoint";
+                scene.add( patrol10 );
+
+                var patrol11 = patrol00.clone();
+                patrol11.position.x = 95;
+                patrol11.position.y = 20;
+                patrol11.position.z = -80;
+                patrol11.name = "patrollPoint";
+                scene.add( patrol11 );
+
+                patrolPoints.push(patrol00);
+                patrolPoints.push(patrol01);
+                patrolPoints.push(patrol02);
+                patrolPoints.push(patrol03);
+                patrolPoints.push(patrol04);
+                patrolPoints.push(patrol05);
+                patrolPoints.push(patrol06);
+                patrolPoints.push(patrol07);
+                patrolPoints.push(patrol08);
+                patrolPoints.push(patrol09);
+                patrolPoints.push(patrol10);
+                patrolPoints.push(patrol11);
+
+                // Nivel 2
+                // - 1 -
+                var patrol12 = patrol00.clone();
+                patrol12.position.x = -2905;
+                patrol12.position.y = 20;
+                patrol12.position.z = -125;
+                patrol12.name = "patrollPoint";
+                scene.add( patrol12 );
+
+                var patrol13 = patrol00.clone();
+                patrol13.position.x = -2810;
+                patrol13.position.y = 20;
+                patrol13.position.z = -125;
+                patrol13.name = "patrollPoint";
+                scene.add( patrol13 );
+
+                var patrol14 = patrol00.clone();
+                patrol14.position.x = -2810;
+                patrol14.position.y = 20;
+                patrol14.position.z = -80;
+                patrol14.name = "patrollPoint";
+                scene.add( patrol14 );
+                // - 2 -
+                var patrol15 = patrol00.clone();
+                patrol15.position.x = -2900;
+                patrol15.position.y = 20;
+                patrol15.position.z = -225;
+                patrol15.name = "patrollPoint";
+                scene.add( patrol15 );
+
+                var patrol16 = patrol00.clone();
+                patrol16.position.x = -3000;
+                patrol16.position.y = 20;
+                patrol16.position.z = -180;
+                patrol16.name = "patrollPoint";
+                scene.add( patrol16 );
+
+                var patrol17 = patrol00.clone();
+                patrol17.position.x = -3000;
+                patrol17.position.y = 20;
+                patrol17.position.z = -225;
+                patrol17.name = "patrollPoint";
+                scene.add( patrol17 );
+
+                var patrol18 = patrol00.clone();
+                patrol18.position.x = -3000;
+                patrol18.position.y = 20;
+                patrol18.position.z = -315;
+                patrol18.name = "patrollPoint";
+                scene.add( patrol18 );
+                // - 3 -
+                var patrol19 = patrol00.clone();
+                patrol19.position.x = -2905;
+                patrol19.position.y = 20;
+                patrol19.position.z = -365;
+                patrol19.name = "patrollPoint";
+                scene.add( patrol19 );
+
+                var patrol20 = patrol00.clone();
+                patrol20.position.x = -2760;
+                patrol20.position.y = 20;
+                patrol20.position.z = -365;
+                patrol20.name = "patrollPoint";
+                scene.add( patrol20 );
+                // - 4 -
+                var patrol21 = patrol00.clone();
+                patrol21.position.x = -3285;
+                patrol21.position.y = 20;
+                patrol21.position.z = -610;
+                patrol21.name = "patrollPoint";
+                scene.add( patrol21 );
+
+                var patrol22 = patrol00.clone();
+                patrol22.position.x = -3000;
+                patrol22.position.y = 20;
+                patrol22.position.z = -610;
+                patrol22.name = "patrollPoint";
+                scene.add( patrol22 );
+                // - 5 -
+                var patrol23 = patrol00.clone();
+                patrol23.position.x = -3340;
+                patrol23.position.y = 20;
+                patrol23.position.z = -320;
+                patrol23.name = "patrollPoint";
+                scene.add( patrol23 );
+
+                var patrol24 = patrol00.clone();
+                patrol24.position.x = -3340;
+                patrol24.position.y = 20;
+                patrol24.position.z = -320;
+                patrol24.name = "patrollPoint";
+                scene.add( patrol24 );
+
+                var patrol25 = patrol00.clone();
+                patrol25.position.x = -3195;
+                patrol25.position.y = 20;
+                patrol25.position.z = -175;
+                patrol25.name = "patrollPoint";
+                scene.add( patrol25 );
+                // - 6 -
+                // x: -2715 z: -705
+                // x: -2855 z: -705
+                // x: -2855 z: -605
+
+                patrolPoints.push(patrol12);
+                patrolPoints.push(patrol13);
+                patrolPoints.push(patrol14);
+                patrolPoints.push(patrol15);
+                patrolPoints.push(patrol16);
+                patrolPoints.push(patrol17);
+                patrolPoints.push(patrol18);
+                patrolPoints.push(patrol19);
+                patrolPoints.push(patrol20);
+                patrolPoints.push(patrol21);
+                patrolPoints.push(patrol22);
+                patrolPoints.push(patrol23);
+                patrolPoints.push(patrol24);
+                patrolPoints.push(patrol25);
+
+                    // Nivel 3
+                // - 1 -
+                var patrol26 = patrol00.clone();
+                patrol26.position.x = -5760;
+                patrol26.position.y = 20;
+                patrol26.position.z = -175;
+                patrol26.name = "patrollPoint";
+                scene.add( patrol26 );
+
+                var patrol27 = patrol00.clone();
+                patrol27.position.x = -6050;
+                patrol27.position.y = 20;
+                patrol27.position.z = -175;
+                patrol27.name = "patrollPoint";
+                scene.add( patrol27 );
+
+                // - 2 -
+                var patrol28 = patrol00.clone();
+                patrol28.position.x = -6100;
+                patrol28.position.y = 20;
+                patrol28.position.z = -120;
+                patrol28.name = "patrollPoint";
+                scene.add( patrol28 );
+
+                var patrol29 = patrol00.clone();
+                patrol29.position.x = -6100;
+                patrol29.position.y = 20;
+                patrol29.position.z = -315;
+                patrol29.name = "patrollPoint";
+                scene.add( patrol29 );
+
+                // - 3 -
+                var patrol30 = patrol00.clone();
+                patrol30.position.x = -6025;
+                patrol30.position.y = 20;
+                patrol30.position.z = -270;
+                patrol30.name = "patrollPoint";
+                scene.add( patrol30 );
+
+                var patrol31 = patrol00.clone();
+                if (gameMode == GameModes.ESCAPE) {
+                    patrol31.position.x = -5955;
+                } else {
+                    patrol31.position.x = -5975;
+                }
+                patrol31.position.y = 20;
+                patrol31.position.z = -270;
+                patrol31.name = "patrollPoint";
+                scene.add( patrol31 );
+
+                // - 4 -
+                var patrol32 = patrol00.clone();
+                patrol32.position.x = -6290;
+                patrol32.position.y = 20;
+                patrol32.position.z = -125;
+                patrol32.name = "patrollPoint";
+                scene.add( patrol32 );
+                
+                var patrol33 = patrol00.clone();
+                patrol33.position.x = -6195;
+                patrol33.position.y = 20;
+                patrol33.position.z = -125;
+                patrol33.name = "patrollPoint";
+                scene.add( patrol33 );
+
+                patrolPoints.push(patrol26);
+                patrolPoints.push(patrol27);
+                patrolPoints.push(patrol28);
+                patrolPoints.push(patrol29);
+                patrolPoints.push(patrol30);
+                patrolPoints.push(patrol31);
+                patrolPoints.push(patrol32);
+                patrolPoints.push(patrol33);
+
+            }
+            
+            patrolPoints.forEach(object => {
+                worldObjects++;
+                isWorldReady.push(true);
+            });
+
+            //      JUGADOR 1
+            worldObjects++;
+            loadOBJWithMTL("assets/Personajes/", "Personaje1_still.obj", "Personaje1_still.mtl", (object) => {
+
+                //object.position.z = 0;
+                //object.position.y = 1;
+                object.rotation.y = THREE.Math.degToRad(90);
+
+                object.rayos = [
+                    new THREE.Vector3(0, 0, 1),     //atras
+                    new THREE.Vector3(0, 0, -1),    //adelante
+                    new THREE.Vector3(1, 0, 0),     //derecha
+                    new THREE.Vector3(-1, 0, 0),    //izquierda
+                    new THREE.Vector3(0, -1, 0)     // ABAJO
+                ]
+
+                personaje1 = object;
+                personaje1.scale.x = 1;
+                personaje1.scale.y = 1;
+                personaje1.scale.z = 1;
+                scene.add(personaje1);
+                isWorldReady.push(true);
+                players.push(personaje1);
+
+                
+            });
+
+            //      JUGADOR 2
+            if (isMultiplayer) {
+                worldObjects++;
+                loadOBJWithMTL("assets/Personajes/", "Personaje2_still.obj", "Personaje2_still.mtl", (object) => {
+
+                    //object.position.z = 0;
+                    //object.position.y = 1;
+                    object.rotation.y = THREE.Math.degToRad(90);
+
+                    object.rayos = [
+                        new THREE.Vector3(0, 0, 1),     //atras
+                        new THREE.Vector3(0, 0, -1),    //adelante
+                        new THREE.Vector3(1, 0, 0),     //derecha
+                        new THREE.Vector3(-1, 0, 0),    //izquierda
+                        new THREE.Vector3(0, -1, 0)     // ABAJO
+                    ]
+
+                    personaje2 = object;
+                    personaje2.scale.x = 1;
+                    personaje2.scale.y = 1;
+                    personaje2.scale.z = 1;
+                    scene.add(personaje2);
+                    isWorldReady.push(true);
+                    players.push(personaje2);
+                });
+            }
+
+            //      Cámaras enemigas
+            worldObjects++;
+            loadOBJWithMTL("assets/Enemigos/", "Camara1.obj", "Camara1.mtl", (object) => {
+
+                object.position.x = -95;
+                object.position.z = -128;
+                object.position.y = 2;
+
+                object.userData = {
+                    colisionando: false
+                }
+                //camara enemiga 1
+
+                scene.add(object);
+                isWorldReady.push(true);
+            });
+
+            worldObjects++;
+            loadOBJWithMTL("assets/Enemigos/", "Camara1.obj", "Camara1.mtl", (object) => {
+
+                object.position.x = 192;
+                object.position.z = -320;
+                object.position.y = 2;
+                object.rotation.y = THREE.Math.degToRad(270);
+
+                object.userData = {
+                    colisionando: false
+                }
+                //camara enemiga 2
+
+                scene.add(object);
+                isWorldReady.push(true);
+            });
+
+            worldObjects++;
+            loadOBJWithMTL("assets/Enemigos/", "Camara1.obj", "Camara1.mtl", (object) => {
+
+                object.position.x = -191;
+                object.position.z = -656;
+                object.position.y = 2;
+                object.rotation.y = THREE.Math.degToRad(0);
+
+                object.userData = {
+                    colisionando: false
+                }
+                //camara enemiga 3
+
+                scene.add(object);
+                isWorldReady.push(true);
+            });
+
+            //      Robot enemmigo
+            worldObjects++;
+            worldObjects++;
+            worldObjects++;
+            worldObjects++;
+            worldObjects++;
+            worldObjects++;
+            worldObjects++;
+            worldObjects++;
+            worldObjects++;
+            worldObjects++;
+            worldObjects++;
+
+            loadOBJWithMTL("assets/Enemigos/", "Robot_enemigo.obj", "Robot_enemigo.mtl", (object) => {
+
+                object.position.x = -97;
+                object.position.z = -512;
+                object.position.y = 2;
+                object.nivel = 0;
+                    // Nivel 1
+                //Robot enemigo1
+                enemigo1 = object;
+                scene.add(enemigo1);
+                enemies.push(enemigo1);
+                isWorldReady.push(true);
+
+                // Robot enemigo 2
+                var enemigo2 = enemigo1.clone();
+                enemigo2.nivel = 0;
+                enemigo2.position.x = 95;
+                enemigo2.position.y = 2;
+                enemigo2.position.z = -175;
+                scene.add(enemigo2);
+                enemies.push(enemigo2);
+                isWorldReady.push(true);
+
+                    // Nivel 2
+                var enemigo3 = enemigo1.clone();
+                enemigo3.nivel = 1;
+                enemigo3.position.x = -2810;
+                enemigo3.position.y = 2;
+                enemigo3.position.z = -125;
+                scene.add(enemigo3);
+                enemies.push(enemigo3);
+                isWorldReady.push(true);
+
+                var enemigo4 = enemigo1.clone();
+                enemigo4.nivel = 1;
+                enemigo4.position.x = -3000;
+                enemigo4.position.y = 2;
+                enemigo4.position.z = -225;
+                scene.add(enemigo4);
+                enemies.push(enemigo4);
+                isWorldReady.push(true);
+
+                var enemigo5 = enemigo1.clone();
+                enemigo5.nivel = 1;
+                enemigo5.position.x = -2800;
+                enemigo5.position.y = 2;
+                enemigo5.position.z = -365;
+                scene.add(enemigo5);
+                enemies.push(enemigo5);
+                isWorldReady.push(true);
+
+                var enemigo6 = enemigo1.clone();
+                enemigo6.nivel = 1;
+                enemigo6.position.x = -3195;
+                enemigo6.position.y = 2;
+                enemigo6.position.z = -610;
+                scene.add(enemigo6);
+                enemies.push(enemigo6);
+                isWorldReady.push(true);
+
+                var enemigo7 = enemigo1.clone();
+                enemigo7.nivel = 1;
+                enemigo7.position.x = -3250;
+                enemigo7.position.y = 2;
+                enemigo7.position.z = -320;
+                scene.add(enemigo7);
+                enemies.push(enemigo7);
+                isWorldReady.push(true);
+
+                    // Nivel 3
+                var enemigo8 = enemigo1.clone();
+                enemigo8.nivel = 2;
+                enemigo8.position.x = -5760;
+                enemigo8.position.y = 2;
+                enemigo8.position.z = -175;
+                scene.add(enemigo8);
+                enemies.push(enemigo8);
+                isWorldReady.push(true);
+
+                var enemigo9 = enemigo1.clone();
+                enemigo9.nivel = 2;
+                enemigo9.position.x = -6000;
+                enemigo9.position.y = 2;
+                enemigo9.position.z = -270;
+                scene.add(enemigo9);
+                enemies.push(enemigo9);
+                isWorldReady.push(true);
+
+                var enemigo10 = enemigo1.clone();
+                enemigo10.nivel = 2;
+                enemigo10.position.x = -6100;
+                enemigo10.position.y = 2;
+                enemigo10.position.z = -315;
+                scene.add(enemigo10);
+                enemies.push(enemigo10);
+                isWorldReady.push(true);
+
+                var enemigo11 = enemigo1.clone();
+                enemigo11.nivel = 2;
+                enemigo11.position.x = -6240;
+                enemigo11.position.y = 2;
+                enemigo11.position.z = -130;
+                scene.add(enemigo11);
+                enemies.push(enemigo11);
+                isWorldReady.push(true);
+
+            });
+
+            //      Escenario
+            worldObjects++;
+            loadOBJWithMTL("assets/Mapas/", "Mapa1.obj", "Mapa1.mtl", (object) => {
+
+                object.position.z = -80;
+                object.totalEnemies = 0;
+                object.enemiesRemaining = 0;
+                levels[0] = object;
+                scene.add(levels[0]);
+                colliders.push(levels[0]);
+                patrolPoints.push(levels[0]);
+                isWorldReady.push(true);
+
+            });
+
+            worldObjects++;
+            loadOBJWithMTL("assets/Mapas/", "Mapa2.obj", "Mapa2.mtl", (object) => {
+
+                object.position.x = -3000;
+                object.position.z = -80;
+                object.totalEnemies = 0;
+                object.enemiesRemaining = 0;
+                levels[1] = object;
+                scene.add(levels[1]);
+                colliders.push(levels[1]);
+                patrolPoints.push(levels[1]);
+                isWorldReady.push(true);
+
+            });
+
+            worldObjects++;
+            loadOBJWithMTL("assets/Mapas/", "Mapa3.obj", "Mapa3.mtl", (object) => {
+
+                object.position.x = -6000;
+                object.position.z = -80;
+                object.totalEnemies = 0;
+                object.enemiesRemaining = 0;
+                levels[2] = object;
+                scene.add(levels[2]);
+                colliders.push(levels[2]);
+                patrolPoints.push(levels[2]);
+                isWorldReady.push(true);
+
+            });
+
+            // OBJECTS
+
+            worldObjects++;
+            worldObjects++;
+            loadOBJWithMTL("assets/Runes/", "Dagaz.obj", "Dagaz.mtl", (object) => {
+                
+                // STOP WATCH
+                object.rotation.x = 90 * Math.PI / 180;
+
+                object.position.x = -145;
+                object.position.y = 10;
+                object.position.z = -175;
+                
+                object.scale.x = 20;
+                object.scale.y = 20;
+                object.scale.z = 20;
+
+                object.name = "item";
+                object.type = "stopWatch";
+
+                scene.add(object);
+                isWorldReady.push(true);
+                items.push(object);
+
+                const light = new THREE.PointLight( 0xFF9600, 1, 100, 2 );
+                object.add( light );
+
+                    // Nivel 3
+
+                var stopWatch2 = object.clone();
+                stopWatch2.position.x = -5760;
+                stopWatch2.position.y = 10;
+                stopWatch2.position.z = -360;
+                stopWatch2.name = "item";
+                stopWatch2.type = "stopWatch";
+                scene.add(stopWatch2);
+                isWorldReady.push(true);
+                items.push(stopWatch2);
+                
+                var light2 = clone(light);
+                stopWatch2.add(light2);
+
+            });
+
+            worldObjects++;
+            worldObjects++;
+            loadOBJWithMTL("assets/Runes/", "Hagalaz.obj", "Hagalaz.mtl", (object) => {
+                // INVISIBILIDAD
+                object.rotation.x = 90 * Math.PI / 180;
+
+                object.position.x = 45;
+                object.position.y = 10;
+                object.position.z = -415;
+                
+                object.scale.x = 20;
+                object.scale.y = 20;
+                object.scale.z = 20;
+
+                object.name = "item";
+                object.type = "inv";
+
+                scene.add(object);
+                isWorldReady.push(true);
+                items.push(object);
+
+                const light = new THREE.PointLight( 0x00FFF2, 1, 100, 2 );
+                object.add( light );
+
+                    // Nivel 3
+
+                var inv2 = object.clone();
+                inv2.position.x = -5830;
+                inv2.position.y = 10;
+                inv2.position.z = -80;
+                inv2.name = "item";
+                inv2.type = "inv";
+                scene.add(inv2);
+                isWorldReady.push(true);
+                items.push(inv2);
+                var light2 = clone(light);
+                inv2.add(light2);
+
+            });
+
+            worldObjects++;
+            worldObjects++;
+            loadOBJWithMTL("assets/Runes/", "Othilla.obj", "Othilla.mtl", (object) => {
+                
+                // INTANGIBILIDAD
+                object.rotation.x = 90 * Math.PI / 180;
+
+                object.position.x = 45;
+                object.position.y = 10;
+                object.position.z = -655;
+
+                object.scale.x = 20;
+                object.scale.y = 20;
+                object.scale.z = 20;
+
+                object.name = "item";
+                object.type = "intang";
+
+                scene.add(object);
+                isWorldReady.push(true);
+                items.push(object);
+
+                const light = new THREE.PointLight( 0xFF00E3, 1, 100, 2 );
+                object.add( light );
+
+                    // Nivel 3
+                var intang2 = object.clone();
+                intang2.position.x = -6240;
+                intang2.position.y = 10;
+                intang2.position.z = -130;
+                intang2.name = "item";
+                intang2.type = "intang";
+                scene.add(intang2);
+                isWorldReady.push(true);
+                items.push(intang2);
+
+                var light2 = clone(light);
+                intang2.add(light2);
+
+            });
+
+        }
+
+        function moveForwardP1() {
+
+            if (keys["W"]) {    // Adelante
+                if(!personaje1.blockAdelante) {
+                    personaje1.position.z -= personaje1.MovZ * deltaTime;
+                    if (!keys["A"] && !keys["D"]) {
+                        personaje1.rotation.y = THREE.Math.degToRad(90);
+                    }
+                    personaje1.camera.position.z -= personaje1.MovZ * deltaTime; // ESTO NO DEBERÍA ESTAR AQUÍ
+                }
+
+            }
+
+            if (keys["S"]) {    // Atrás
+                if(!personaje1.blockAtras) {
+                    personaje1.position.z += personaje1.MovZ * deltaTime;
+                    if( !keys["A"] && !keys["D"]) { 
+                        personaje1.rotation.y = THREE.Math.degToRad(270);
+                    }
+                    personaje1.camera.position.z += personaje1.MovZ * deltaTime; // ESTO NO DEBERÍA ESTAR AQUÍ
+                }
+            }
+
+        }
+
+        function moveSidewayP1() {
+
+            if (keys["A"]) {    // Izquierda
+                if(!personaje1.blockIzquierda) {
+                    personaje1.position.x -= personaje1.MovX * deltaTime;
+                    personaje1.rotation.y = THREE.Math.degToRad(180);
+                    personaje1.camera.position.x -= personaje1.MovX * deltaTime; // ESTO NO DEBERÍA ESTAR AQUÍ
+                }
+
+            }
+
+            if (keys["D"]) {    // Derecha
+                if(!personaje1.blockDerecha) {
+                    personaje1.position.x += personaje1.MovX * deltaTime;
+                    personaje1.rotation.y = THREE.Math.degToRad(0);
+                    personaje1.camera.position.x += personaje1.MovX * deltaTime; // ESTO NO DEBERÍA ESTAR AQUÍ
+                }
+            }
+
+        }
+
+        function useItem() {
+            
+            if (keys["E"]) {    // Use Item
+
+                switch (personaje1.pickup) {
+                    
+                    case "stopWatch": {
+
+                        $("#sfxStopTime")[0].play();
+                        $("#sfxStopTime").prop("loop", false);
+                        $('#sfxStopTime').prop("volume", volumenGlobal * volumenEfectos);
+
+                        enemies.forEach(Enemy => {
+                            Enemy.posNextLocations = [];
+                            Enemy.state = enemyStates.WAIT;
+                            Enemy.sleeping = 0;
+                        });
+
+                        break;
+                    }
+
+                    case "inv": {
+
+                        $("#sfxInvisible")[0].play();
+                        $("#sfxInvisible").prop("loop", false);
+                        $('#sfxInvisible').prop("volume", volumenGlobal * volumenEfectos);
+
+                        personaje1.Invisible = true;
+                        break;
+                    }
+
+                    case "intang": {
+
+                        $("#sfxIntangible")[0].play();
+                        $("#sfxIntangible").prop("loop", false);
+                        $('#sfxIntangible').prop("volume", volumenGlobal * volumenEfectos);
+
+                        personaje1.Intangible = true;
+                        personaje1.blockAdelante = false;
+                        personaje1.blockAtras = false;
+                        personaje1.blockIzquierda = false;
+                        personaje1.blockDerecha = false;
+                        break;
+                    }
+
+                    default: {
+
+                        break;
+                    }
+                }
+
+                personaje1.pickup = null;
+
+            }
+
+            if (keys["Q"]) {    // Attack
+                if (gameMode == GameModes.ELIMINATION) {
+                    if (!personaje1.inAttkCooldown) {
+
+                        var sounds = [  "assets/attack1.mp3",
+                                        "assets/attack2.mp3",
+                                        "assets/attack3.mp3",
+                                    ];
+                        
+                        var soundFile = sounds[Math.floor(Math.random()*sounds.length)];
+
+                        $("#sfxAttack").prop("src", soundFile);
+                        $("#sfxAttack").prop("loop", false);
+                        $('#sfxAttack').prop("volume", volumenGlobal * volumenEfectos);
+                        $("#sfxAttack")[0].play();
+
+                        personaje1.add(personaje1.cdBar);
+                        var looking = THREE.Math.radToDeg(personaje1.rotation.y);
+                        var hray = 20;
+                        var sepray = 1;
+                        var rayTarget = [];
+
+                        if (looking < 35 || looking > 325) {
+                            var rayPos = new THREE.Vector3(personaje1.position.x, hray, personaje1.position.z);
+                            rayCaster.set(rayPos, enemyRays[2]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            var ray2Pos = new THREE.Vector3(personaje1.position.x, hray, personaje1.position.z+sepray);
+                            rayCaster.set(ray2Pos, enemyRays[2]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            var ray3Pos = new THREE.Vector3(personaje1.position.x, hray, personaje1.position.z-sepray);
+                            rayCaster.set(ray3Pos, enemyRays[2]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            if (rayTarget.length > 0) {
+
+                                var d = rayTarget[0].distance;
+                                if (d < 20) {
+
+                                    var Enemy = rayTarget[0].object.parent;
+                                    var i = enemies.indexOf(Enemy);
+                                    Enemy.sndPatrol.pause();
+                                    
+                                    //$("#sfxPickup").prop("loop", false);
+                                    //$('#sfxPickup').prop("volume", volumenGlobal * volumenEfectos);
+                                    //$("#sfxPickup")[0].play();
+
+                                    enemies.splice(i, 1);
+                                    scene.remove(Enemy);
+                                    levels[currentLevel].enemiesRemaining--;
+                                    personaje1.eliminaciones += 1;
+
+                                }
+                                
+                            }
+
+                        } else if (looking < 125 && looking > 55) {
+
+                            var rayPos = new THREE.Vector3(personaje1.position.x, hray, personaje1.position.z);
+                            rayCaster.set(rayPos, enemyRays[1]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            var ray2Pos = new THREE.Vector3(personaje1.position.x+sepray, hray, personaje1.position.z);
+                            rayCaster.set(ray2Pos, enemyRays[1]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            var ray3Pos = new THREE.Vector3(personaje1.position.x-sepray, hray, personaje1.position.z);
+                            rayCaster.set(ray3Pos, enemyRays[1]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            if (rayTarget.length > 0) {
+
+                                var d = rayTarget[0].distance;
+                                if (d < 20) {
+
+                                    var Enemy = rayTarget[0].object.parent;
+                                    var i = enemies.indexOf(Enemy);
+                                    Enemy.sndPatrol.pause();
+                                    
+                                    //$("#sfxPickup").prop("loop", false);
+                                    //$('#sfxPickup').prop("volume", volumenGlobal * volumenEfectos);
+                                    //$("#sfxPickup")[0].play();
+
+                                    enemies.splice(i, 1);
+                                    scene.remove(Enemy);
+                                    levels[currentLevel].enemiesRemaining--;
+                                    personaje1.eliminaciones += 1;
+                                }
+                                
+                            }
+
+                        } else if (looking < 215 && looking > 145) {
+
+                            var rayPos = new THREE.Vector3(personaje1.position.x, hray, personaje1.position.z);
+                            rayCaster.set(rayPos, enemyRays[3]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            var ray2Pos = new THREE.Vector3(personaje1.position.x, hray, personaje1.position.z+sepray);
+                            rayCaster.set(ray2Pos, enemyRays[3]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            var ray3Pos = new THREE.Vector3(personaje1.position.x, hray, personaje1.position.z-sepray);
+                            rayCaster.set(ray3Pos, enemyRays[3]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            if (rayTarget.length > 0) {
+
+                                var d = rayTarget[0].distance;
+                                if (d < 20) {
+
+                                    var Enemy = rayTarget[0].object.parent;
+                                    var i = enemies.indexOf(Enemy);
+                                    Enemy.sndPatrol.pause();
+                                    
+                                    //$("#sfxPickup").prop("loop", false);
+                                    //$('#sfxPickup').prop("volume", volumenGlobal * volumenEfectos);
+                                    //$("#sfxPickup")[0].play();
+
+                                    enemies.splice(i, 1);
+                                    scene.remove(Enemy);
+                                    levels[currentLevel].enemiesRemaining--;
+                                    personaje1.eliminaciones += 1;
+                                }
+                                
+                            }
+
+                        } else if (looking < 305 && looking > 235) {
+
+                            var rayPos = new THREE.Vector3(personaje1.position.x, hray, personaje1.position.z);
+                            rayCaster.set(rayPos, enemyRays[0]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            var ray2Pos = new THREE.Vector3(personaje1.position.x+sepray, hray, personaje1.position.z);
+                            rayCaster.set(ray2Pos, enemyRays[0]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            var ray3Pos = new THREE.Vector3(personaje1.position.x-sepray, hray, personaje1.position.z);
+                            rayCaster.set(ray3Pos, enemyRays[0]);
+                            //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                            rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                rayTarget.push(enemyTarget);
+                            });
+
+                            if (rayTarget.length > 0) {
+
+                                var d = rayTarget[0].distance;
+                                if (d < 20) {
+
+                                    var Enemy = rayTarget[0].object.parent;
+                                    var i = enemies.indexOf(Enemy);
+                                    Enemy.sndPatrol.pause();
+                                    
+                                    //$("#sfxPickup").prop("loop", false);
+                                    //$('#sfxPickup').prop("volume", volumenGlobal * volumenEfectos);
+                                    //$("#sfxPickup")[0].play();
+
+                                    enemies.splice(i, 1);
+                                    scene.remove(Enemy);
+                                    levels[currentLevel].enemiesRemaining--;
+                                    personaje1.eliminaciones += 1;
+                                }
+                                
+                            }
+
+                        }
+
+                        personaje1.inAttkCooldown = true;
+                    } else if (personaje1.attkCooldown > 10) {
+                        $("#sfxCooldown")[0].play();
+                        $("#sfxCooldown").prop("loop", false);
+                        $('#sfxCooldown').prop("volume", volumenGlobal * volumenEfectos);
+                    }
+
+                }
+            }
+
+            if (isMultiplayer) {
+                if (keys["O"]) {    // Use Item
+
+                    switch (personaje2.pickup) {
+                        
+                        case "stopWatch": {
+
+                            $("#sfxStopTime")[0].play();
+                            $("#sfxStopTime").prop("loop", false);
+                            $('#sfxStopTime').prop("volume", volumenGlobal * volumenEfectos);
+
+                            enemies.forEach(Enemy => {
+                                Enemy.posNextLocations = [];
+                                Enemy.state = enemyStates.WAIT;
+                                Enemy.sleeping = 0;
+                            });
+
+                            break;
+                        }
+
+                        case "inv": {
+
+                            $("#sfxInvisible")[0].play();
+                            $("#sfxInvisible").prop("loop", false);
+                            $('#sfxInvisible').prop("volume", volumenGlobal * volumenEfectos);
+
+                            personaje2.Invisible = true;
+                            break;
+                        }
+
+                        case "intang": {
+
+                            $("#sfxIntangible")[0].play();
+                            $("#sfxIntangible").prop("loop", false);
+                            $('#sfxIntangible').prop("volume", volumenGlobal * volumenEfectos);
+
+                            personaje2.Intangible = true;
+                            personaje2.blockAdelante = false;
+                            personaje2.blockAtras = false;
+                            personaje2.blockIzquierda = false;
+                            personaje2.blockDerecha = false;
+                            break;
+                        }
+
+                        default: {
+
+                            break;
+                        }
+                    }
+
+                    personaje2.pickup = null;
+
+                }
+
+                if (keys["U"]) {    // Attack
+                    if (gameMode == GameModes.ELIMINATION) {
+                        if (!personaje2.inAttkCooldown) {
+
+                            var sounds = [  "assets/attack1.mp3",
+                                            "assets/attack2.mp3",
+                                            "assets/attack3.mp3",
+                                        ];
+                            
+                            var soundFile = sounds[Math.floor(Math.random()*sounds.length)];
+
+                            $("#sfxAttack").prop("src", soundFile);
+                            $("#sfxAttack").prop("loop", false);
+                            $('#sfxAttack').prop("volume", volumenGlobal * volumenEfectos);
+                            $("#sfxAttack")[0].play();
+
+                            personaje2.add(personaje2.cdBar);
+                            var looking = THREE.Math.radToDeg(personaje2.rotation.y);
+                            var hray = 20;
+                            var sepray = 1;
+                            var rayTarget = [];
+
+                            if (looking < 35 || looking > 325) {
+                                var rayPos = new THREE.Vector3(personaje2.position.x, hray, personaje2.position.z);
+                                rayCaster.set(rayPos, enemyRays[2]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                var ray2Pos = new THREE.Vector3(personaje2.position.x, hray, personaje2.position.z+sepray);
+                                rayCaster.set(ray2Pos, enemyRays[2]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                var ray3Pos = new THREE.Vector3(personaje2.position.x, hray, personaje2.position.z-sepray);
+                                rayCaster.set(ray3Pos, enemyRays[2]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                if (rayTarget.length > 0) {
+
+                                    var d = rayTarget[0].distance;
+                                    if (d < 20) {
+
+                                        var Enemy = rayTarget[0].object.parent;
+                                        var i = enemies.indexOf(Enemy);
+                                        Enemy.sndPatrol.pause();
+                                        
+                                        //$("#sfxPickup").prop("loop", false);
+                                        //$('#sfxPickup').prop("volume", volumenGlobal * volumenEfectos);
+                                        //$("#sfxPickup")[0].play();
+
+                                        enemies.splice(i, 1);
+                                        scene.remove(Enemy);
+                                        levels[currentLevel].enemiesRemaining--;
+                                        personaje2.eliminaciones += 1;
+                                    }
+                                    
+                                }
+
+                            } else if (looking < 125 && looking > 55) {
+
+                                var rayPos = new THREE.Vector3(personaje2.position.x, hray, personaje2.position.z);
+                                rayCaster.set(rayPos, enemyRays[1]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                var ray2Pos = new THREE.Vector3(personaje2.position.x+sepray, hray, personaje2.position.z);
+                                rayCaster.set(ray2Pos, enemyRays[1]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                var ray3Pos = new THREE.Vector3(personaje2.position.x-sepray, hray, personaje2.position.z);
+                                rayCaster.set(ray3Pos, enemyRays[1]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                if (rayTarget.length > 0) {
+
+                                    var d = rayTarget[0].distance;
+                                    if (d < 20) {
+
+                                        var Enemy = rayTarget[0].object.parent;
+                                        var i = enemies.indexOf(Enemy);
+                                        Enemy.sndPatrol.pause();
+                                        
+                                        //$("#sfxPickup").prop("loop", false);
+                                        //$('#sfxPickup').prop("volume", volumenGlobal * volumenEfectos);
+                                        //$("#sfxPickup")[0].play();
+
+                                        enemies.splice(i, 1);
+                                        scene.remove(Enemy);
+                                        levels[currentLevel].enemiesRemaining--;
+                                        personaje2.eliminaciones += 1;
+                                    }
+                                    
+                                }
+
+                            } else if (looking < 215 && looking > 145) {
+
+                                var rayPos = new THREE.Vector3(personaje2.position.x, hray, personaje2.position.z);
+                                rayCaster.set(rayPos, enemyRays[3]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                var ray2Pos = new THREE.Vector3(personaje2.position.x, hray, personaje2.position.z+sepray);
+                                rayCaster.set(ray2Pos, enemyRays[3]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                var ray3Pos = new THREE.Vector3(personaje2.position.x, hray, personaje2.position.z-sepray);
+                                rayCaster.set(ray3Pos, enemyRays[3]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                if (rayTarget.length > 0) {
+
+                                    var d = rayTarget[0].distance;
+                                    if (d < 20) {
+
+                                        var Enemy = rayTarget[0].object.parent;
+                                        var i = enemies.indexOf(Enemy);
+                                        Enemy.sndPatrol.pause();
+                                        
+                                        //$("#sfxPickup").prop("loop", false);
+                                        //$('#sfxPickup').prop("volume", volumenGlobal * volumenEfectos);
+                                        //$("#sfxPickup")[0].play();
+
+                                        enemies.splice(i, 1);
+                                        scene.remove(Enemy);
+                                        levels[currentLevel].enemiesRemaining--;
+                                        personaje2.eliminaciones += 1;
+                                    }
+                                    
+                                }
+
+                            } else if (looking < 305 && looking > 235) {
+
+                                var rayPos = new THREE.Vector3(personaje2.position.x, hray, personaje2.position.z);
+                                rayCaster.set(rayPos, enemyRays[0]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                var ray2Pos = new THREE.Vector3(personaje2.position.x+sepray, hray, personaje2.position.z);
+                                rayCaster.set(ray2Pos, enemyRays[0]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                var ray3Pos = new THREE.Vector3(personaje2.position.x-sepray, hray, personaje2.position.z);
+                                rayCaster.set(ray3Pos, enemyRays[0]);
+                                //scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                                rayCaster.intersectObjects(enemies, true).forEach( enemyTarget => {
+                                    rayTarget.push(enemyTarget);
+                                });
+
+                                if (rayTarget.length > 0) {
+
+                                    var d = rayTarget[0].distance;
+                                    if (d < 20) {
+
+                                        var Enemy = rayTarget[0].object.parent;
+                                        var i = enemies.indexOf(Enemy);
+                                        Enemy.sndPatrol.pause();
+                                        
+                                        //$("#sfxPickup").prop("loop", false);
+                                        //$('#sfxPickup').prop("volume", volumenGlobal * volumenEfectos);
+                                        //$("#sfxPickup")[0].play();
+
+                                        enemies.splice(i, 1);
+                                        scene.remove(Enemy);
+                                        levels[currentLevel].enemiesRemaining--;
+                                        personaje2.eliminaciones += 1;
+                                    }
+                                    
+                                }
+
+                            }
+
+                            personaje2.inAttkCooldown = true;
+                        } else if (personaje2.attkCooldown > 10) {
+                            $("#sfxCooldown")[0].play();
+                            $("#sfxCooldown").prop("loop", false);
+                            $('#sfxCooldown').prop("volume", volumenGlobal * volumenEfectos);
+                        }
+
+                    }
+                }
+            }
+
+        }
+
+        function handleItems() {
+            players.forEach(Player => {
+
+                if (Player.Invisible) {
+                    if (Player.invTime < Player.maxInvTime) {
+                        Player.invTime += 1;
+
+                        Player.traverse((node) => {
+                            if(node.isMesh) {
+                                node.material.opacity = 0.5;
+                                node.material.transparent = true;
+                            }
+                        });
+
+                    } else {
+                        Player.invTime = 0;
+                        Player.Invisible = false;
+
+                        Player.traverse((node) => {
+                            if(node.isMesh) {
+                                node.material.opacity = 1;
+                                node.material.transparent = false;
+                            }
+                        });
+
+                    }
+                }
+
+                if (Player.Intangible) {
+                    if (Player.intangTime < Player.maxIntangTime) {
+                        Player.intangTime += 1;
+
+                        Player.traverse((node) => {
+                            if(node.isMesh) {
+                                node.material.opacity = 0.5;
+                                node.material.transparent = true;
+                            }
+                        });
+
+                    } else {
+                        Player.intangTime = 0;
+                        Player.Intangible = false;
+
+                        Player.traverse((node) => {
+                            if(node.isMesh) {
+                                node.material.opacity = 1;
+                                node.material.transparent = false;
+                            }
+                        });
+                    }
+                }
+
+                if (Player.inAttkCooldown) {
+                    if (Player.attkCooldown < Player.maxAttkCooldown) {
+                        var geometry = new THREE.CylinderGeometry( 1, 1, (Player.maxAttkCooldown - Player.attkCooldown)/10, 8 );
+                        Player.cdBar.geometry = geometry ;
+                        Player.attkCooldown += 1;
+
+                    } else {
+                        Player.cdBar.geometry.parameters.height = 0;
+                        Player.attkCooldown = 0;
+                        Player.inAttkCooldown = false;
+                        Player.remove(Player.cdBar);
+                    }
+                } else {
+                    Player.cdBar.geometry.parameters.height = 0;
+                }
+
+                if (Player.pickup != null) {
+                    if (Player.pickupSprite == null) {
+                        var name = 'assets/' + Player.pickup + '.png';
+                        var map = new THREE.TextureLoader().load( name );
+                        var material = new THREE.SpriteMaterial( { map: map } );
+                    
+                        Player.pickupSprite = new THREE.Sprite( material );
+                        scene.add( Player.pickupSprite );
+                        Player.pickupSprite.scale.x *= 2.5;
+                        Player.pickupSprite.scale.y *= 2.5;
+                        Player.pickupSprite.scale.z *= 2.5;
+
+                    } else {
+                        Player.pickupSprite.position.x = Player.camera.position.x;
+                        Player.pickupSprite.position.y = Player.camera.position.y - 20;
+                        Player.pickupSprite.position.z = Player.camera.position.z - 25;
+                    }
+                } else {
+                    scene.remove( Player.pickupSprite );
+                    Player.pickupSprite = null;
+                }
+
+            });
+        }
+
+        function moveForwardP2() {
+
+            if (keys["I"]) {    // Adelante
+                if(!personaje2.blockAdelante) {
+                    personaje2.position.z -= personaje2.MovZ * deltaTime;
+                    personaje2.rotation.y = THREE.Math.degToRad(90);
+                    personaje2.camera.position.z -= personaje2.MovZ * deltaTime;
+                }
+
+            }
+
+            if (keys["K"]) {    // Atrás
+                if(!personaje2.blockAtras) {
+                    personaje2.position.z += personaje2.MovZ * deltaTime;
+                    personaje2.rotation.y = THREE.Math.degToRad(270);
+                    personaje2.camera.position.z += personaje2.MovZ * deltaTime;
+                }
+
+            }
+
+        }
+
+        function moveSidewayP2() {
+
+            if (keys["J"]) {    // Izquierda
+                if(!personaje2.blockIzquierda) {
+                    personaje2.position.x -= personaje2.MovX * deltaTime;
+                    personaje2.rotation.y = THREE.Math.degToRad(180);
+                    personaje2.camera.position.x -= personaje2.MovX * deltaTime;
+                }
+
+            }
+
+            if (keys["L"]) {    // Derecha
+                if(!personaje2.blockDerecha) {
+                    personaje2.position.x += personaje2.MovX * deltaTime;
+                    personaje2.rotation.y = THREE.Math.degToRad(0);
+                    personaje2.camera.position.x += personaje2.MovX * deltaTime;
+                }
+
+            }
+
+        }
+
+        function paramsIniticials() {
+            personaje1.MovX = 50;
+            personaje1.MovY = 50;
+            personaje1.MovZ = 50;
+
+            personaje1.blockAdelante = false;
+            personaje1.blockAtras = false;
+            personaje1.blockIzquierda = false;
+            personaje1.blockDerecha = false;
+            personaje1.tocandoSuelo = true;
+
+            personaje1.camera = cameraP1;
+
+            personaje1.pickup = null;
+            personaje1.pickupSprite = null;
+
+            personaje1.Invisible = false;
+            personaje1.invTime = 0;
+            personaje1.maxInvTime = 300;
+
+            personaje1.Intangible = false;
+            personaje1.intangTime = 0;
+            personaje1.maxIntangTime = 300;
+
+            personaje1.inAttkCooldown = false;
+            personaje1.attkCooldown = 0;
+            personaje1.maxAttkCooldown = 150;
+
+            var geometry = new THREE.CylinderGeometry( 1, 1, 20, 8 );
+            var material = new THREE.MeshBasicMaterial( {color: 0xFFFFC2} );
+            var cdBar = new THREE.Mesh( geometry, material );
+            personaje1.cdBar = cdBar;
+            personaje1.cdBar.rotation.x = 90 * Math.PI / 180;
+
+            //personaje1.add(personaje1.cdBar);
+            personaje1.cdBar.position.y += 40;
+
+            personaje1.puntuacion = 0;
+            personaje1.eliminaciones = 0;
+
+            if (isMultiplayer) {
+                personaje2.MovX = 50;
+                personaje2.MovY = 50;
+                personaje2.MovZ = 50;
+
+                personaje2.blockAdelante = false;
+                personaje2.blockAtras = false;
+                personaje2.blockIzquierda = false;
+                personaje2.blockDerecha = false;
+                personaje2.tocandoSuelo = true;
+
+                personaje2.camera = cameraP2;
+
+                personaje2.pickup = null;
+                personaje2.pickupSprite = null;
+
+                personaje2.Invisible = false;
+                personaje2.invTime = 0;
+                personaje2.maxInvTime = 300;
+
+                personaje2.Intangible = false;
+                personaje2.intangTime = 0;
+                personaje2.maxIntangTime = 300;
+
+                personaje2.inAttkCooldown = false;
+                personaje2.attkCooldown = 0;
+                personaje2.maxAttkCooldown = 150;
+
+                var geometry = new THREE.CylinderGeometry( 1, 1, 20, 8 );
+                var material = new THREE.MeshBasicMaterial( {color: 0xFFFFC2} );
+                var cdBar = new THREE.Mesh( geometry, material );
+                personaje2.cdBar = cdBar;
+                personaje2.cdBar.rotation.x = 90 * Math.PI / 180;
+
+                //personaje1.add(personaje1.cdBar);
+                personaje2.cdBar.position.y += 40;
+
+                personaje2.puntuacion = 0;
+                personaje2.eliminaciones = 0;
+            }
+
+            paramsInicialesCargados = true;
+
+        }
+
+        function paramsEnemigos() {
+            enemies.forEach(Enemy => {
+                Enemy.state = enemyStates.WAIT;
+                if (gameDifficulty == GameDifficulty.NORMAL) {
+                    Enemy.maxSleep = 300;
+                    Enemy.robotSpd = 1;
+                } else {
+                    Enemy.maxSleep = 150;
+                    Enemy.robotSpd = 1.25;
+                }
+                Enemy.sleeping = 0;
+                Enemy.vRot = 0;
+                Enemy.hRot = 0;
+                Enemy.iNextLocation;
+                Enemy.posNextLocations = [];
+
+                //#region Voices and Sounds
+                    Enemy.sndPatrol = new THREE.PositionalAudio( listener );
+
+                    var sndVoice_Alarm = new THREE.PositionalAudio( listener );
+                    var sndVoice_Antivirus = new THREE.PositionalAudio( listener );
+                    var sndVoice_iWillCaughtYou = new THREE.PositionalAudio( listener );
+                    var sndVoice_lookingForTheRobot = new THREE.PositionalAudio( listener );
+                    var sndVoice_patrolModeActivated = new THREE.PositionalAudio( listener );
+                    var sndVoice_whereAreU = new THREE.PositionalAudio( listener );
+                    var sndVoice_youWillNotEscape = new THREE.PositionalAudio( listener );
+
+                    var audioLoader = new THREE.AudioLoader();
+                    audioLoader.load( 'assets/enemyPatrol_fast.mp3', function( buffer ) {
+                        Enemy.sndPatrol.setBuffer( buffer );
+                        Enemy.sndPatrol.setLoop(true);
+                        Enemy.sndPatrol.setVolume(volumenGlobal * volumenEfectos);
+                        Enemy.sndPatrol.setRefDistance( 10 );
+                        Enemy.sndPatrol.play();
+                    });
+
+                    audioLoader.load( 'assets/Voices/Alarm.mp3', function( buffer ) {
+                        sndVoice_Alarm.setBuffer( buffer );
+                        sndVoice_Alarm.setVolume(volumenGlobal * volumenEfectos);
+                        sndVoice_Alarm.setRefDistance( 20 );
+                        //sndVoice_Alarm.play();
+                    });
+
+                    audioLoader.load( 'assets/Voices/Antivirus.mp3', function( buffer ) {
+                        sndVoice_Antivirus.setBuffer( buffer );
+                        sndVoice_Antivirus.setVolume(volumenGlobal * volumenEfectos);
+                        sndVoice_Antivirus.setRefDistance( 20 );
+                        //sndVoice_Antivirus.play();
+                    });
+
+                    audioLoader.load( 'assets/Voices/iWillCaughtYou.mp3', function( buffer ) {
+                        sndVoice_iWillCaughtYou.setBuffer( buffer );
+                        sndVoice_iWillCaughtYou.setVolume(volumenGlobal * volumenEfectos);
+                        sndVoice_iWillCaughtYou.setRefDistance( 20 );
+                        //sndVoice_iWillCaughtYou.play();
+                    });
+
+                    audioLoader.load( 'assets/Voices/lookingForTheRobot.mp3', function( buffer ) {
+                        sndVoice_lookingForTheRobot.setBuffer( buffer );
+                        sndVoice_lookingForTheRobot.setVolume(volumenGlobal * volumenEfectos);
+                        sndVoice_lookingForTheRobot.setRefDistance( 20 );
+                        //sndVoice_lookingForTheRobot.play();
+                    });
+
+                    audioLoader.load( 'assets/Voices/patrolModeActivated.mp3', function( buffer ) {
+                        sndVoice_patrolModeActivated.setBuffer( buffer );
+                        sndVoice_patrolModeActivated.setVolume(volumenGlobal * volumenEfectos);
+                        sndVoice_patrolModeActivated.setRefDistance( 20 );
+                        //sndVoice_patrolModeActivated.play();
+                    });
+
+                    audioLoader.load( 'assets/Voices/WhereAreU.mp3', function( buffer ) {
+                        sndVoice_whereAreU.setBuffer( buffer );
+                        sndVoice_whereAreU.setVolume(volumenGlobal * volumenEfectos);
+                        sndVoice_whereAreU.setRefDistance( 20 );
+                        //sndVoice_whereAreU.play();
+                    });
+
+                    audioLoader.load( 'assets/Voices/youWillNotEscape.mp3', function( buffer ) {
+                        sndVoice_youWillNotEscape.setBuffer( buffer );
+                        sndVoice_youWillNotEscape.setVolume(volumenGlobal * volumenEfectos);
+                        sndVoice_youWillNotEscape.setRefDistance( 20 );
+                        //sndVoice_youWillNotEscape.play();
+                    });
+
+                    Enemy.add(Enemy.sndPatrol);
+
+                    Enemy.voices = [sndVoice_Alarm, sndVoice_Antivirus, sndVoice_iWillCaughtYou, 
+                                    sndVoice_lookingForTheRobot, sndVoice_patrolModeActivated,
+                                    sndVoice_whereAreU, sndVoice_youWillNotEscape];
+
+                //#region 
+                levels[Enemy.nivel].enemiesRemaining++;
+                levels[Enemy.nivel].totalEnemies++;
+            });
+
+            paramsEnemigosCargados = true;
+        }
+
+        function collisionObjects() {
+
+            /* * * * * * * * * * * * * * * *
+            *    COLISIONES CON PAREDES    *
+            * * * * * * * * * * * * * * * */
+
+                // Esto lo voy a cambiar por un 
+            players.forEach (Player => {  
+                var rayPos = new THREE.Vector3(Player.position.x, Player.position.y + 5, Player.position.z);
+                if (!Player.Intangible) {
+                    var pushForce = 50 * deltaTime;
+                    rayCaster.set(rayPos, Player.rayos[0]);
+
+                    var colision00 = rayCaster.intersectObjects(colliders, true);
+                    var collideDistance = 10;
+                        // Raycasting para las colisiones
+                        //  Atrás
+                    if (colision00.length > 0 && colision00[0].distance < collideDistance) {
+                        Player.blockAtras = true;
+                        Player.position.z -= pushForce;
+                        Player.camera.position.z -= pushForce;
+                    } else {
+                        Player.blockAtras = false;
+                    }
+
+                    rayCaster.set(rayPos, Player.rayos[1]);
+                    var colision01 = rayCaster.intersectObjects(colliders, true);
+                        // Adelante
+                    if (colision01.length > 0 && colision01[0].distance < collideDistance) {
+                        Player.blockAdelante = true;
+                        Player.position.z += pushForce;
+                        Player.camera.position.z += pushForce;
+                    } else {
+                        Player.blockAdelante = false;
+                    }
+
+                    rayCaster.set(rayPos, Player.rayos[2]);
+                    var colision02 = rayCaster.intersectObjects(colliders, true);
+                        // Derecha
+                    if (colision02.length > 0 && colision02[0].distance < collideDistance) {
+                        Player.blockDerecha = true;
+                        Player.position.x -= pushForce;
+                        Player.camera.position.x -= pushForce;
+                    } else {
+                        Player.blockDerecha = false;
+                    }
+
+                    rayCaster.set(rayPos, Player.rayos[3]);
+                    var colision03 = rayCaster.intersectObjects(colliders, true);
+                        // Izquierda
+                    if (colision03.length > 0 && colision03[0].distance < collideDistance) {
+                        Player.blockIzquierda = true;
+                        Player.position.x += pushForce;
+                        Player.camera.position.x += pushForce;
+                    } else {
+                        Player.blockIzquierda = false;
+                    }
+                }
+
+                rayCaster.set(rayPos, Player.rayos[4]);
+                var colision04 = rayCaster.intersectObjects(colliders, true);
+                    // Izquierda
+                if (colision04.length > 0) {
+                    Player.tocandoSuelo = true;
+                } else {
+                    Player.tocandoSuelo = false;;
+                }
+
+                /* * * * * * * * * * * * * * * *
+                *    COLISIONES CON OBJETOS    *
+                * * * * * * * * * * * * * * * */
+
+                items.forEach(function (item, i) {
+                    var d = getDistance(Player, item);
+                    if (d < 21  && Player.pickup == null) {
+
+                        $("#sfxPickup").prop("loop", false);
+                        $('#sfxPickup').prop("volume", volumenGlobal * volumenEfectos);
+                        $("#sfxPickup")[0].play();
+
+                        Player.pickup = item.type;
+                        
+                        items.splice(i, 1);
+                        scene.remove(item);
+                    }
+                });
+            });
+
+        }
+
+        function conditionsToWin() {
+            switch (gameMode) {
+                
+                case GameModes.ESCAPE: {
+
+                    players.forEach(Player => {
+                        if (Player.position.z < -450 && !Player.tocandoSuelo) {
+                            if (isMultiplayer) {
+                                Player.puntuacion -= Player.puntuacion/4;
+                            }
+                            pasarNivel();
+                        }
+                    });
+
+                    break;
+                }
+
+                case GameModes.ELIMINATION: {
+
+                    if (levels[currentLevel].enemiesRemaining <= 0) {
+                        pasarNivel();
+                    }
+
+                    break;
+                }
+            }            
+        }
+
+        function pasarNivel() {
+            var cantNiveles = levels.length;
+
+            currentLevel++;
+            if (currentLevel+1 <= cantNiveles) {
+                players.forEach(Player => {
+                    Player.position.x = levels[currentLevel].position.x;
+                    Player.position.y = levels[currentLevel].position.y;
+                    Player.position.z = levels[currentLevel].position.z + 80;
+
+                    Player.camera.position.x = Player.position.x;
+                    Player.camera.position.y = Player.position.y + 120;
+                    Player.camera.position.z = Player.position.z + 50;
+                });
+            } else {
+                gameState = "Ganaste";
+            }
+        }
+
+        //Menu
+        function menu() {
+            $("#bar-section").remove();
+            $("#game-mode-menu").remove();
+            $("body").append("<div id='menu-principal' style=''></div>");
+            $("#menu-principal").append("<img id='menu-principal-background' src='assets/menu-principal.jpg'>" +
+                                        "<img id='btnSingleplayer' class='btnOrder-1' src='assets/btn_play.png'>" +
+                                        "<img id='btnMultiplayer' class='btnOrder-2' src='assets/btn_multiplayer.png'>");
+            
+            $("#btnSingleplayer").on("click", function () {
+                isMultiplayer = false;
+
+                $("#sfxClick").prop("loop", false);
+                $('#sfxClick').prop("volume", volumenGlobal * volumenEfectos);
+                $("#sfxClick")[0].play();
+
+                chooseGameMode();
+            });
+            $("#btnMultiplayer").on("click", function () {
+                isMultiplayer = true;
+                $("#sfxClick").prop("loop", false);
+                $('#sfxClick').prop("volume", volumenGlobal * volumenEfectos);
+                $("#sfxClick")[0].play();
+                chooseGameMode();
+                //shareFB();
+            });
+
+        }
+
+        function chooseGameMode() {
+            $("#game-diff-menu").remove();
+            $("#menu-principal").remove();
+            $("body").append("<div id='game-mode-menu'></div>");
+            $("#game-mode-menu").append("<img id='menu-principal-background' src='assets/menu-principal.jpg'>" +
+                                        "<img id='btnModeEscape' class='btnOrder-1' src='assets/btn_escape.png'>" + 
+                                        "<img id='btnModeElimination' class='btnOrder-2' src='assets/btn_elimination.png'>" + 
+                                        "<img id='btnAtras' class='btnOrder-3' src='assets/btn_atras.png'>");
+
+            $("#btnModeEscape").on("click", function () {
+                gameMode = GameModes.ESCAPE;
+                $("#sfxClick").prop("loop", false);
+                $('#sfxClick').prop("volume", volumenGlobal * volumenEfectos);
+                $("#sfxClick")[0].play();
+                chooseDifficulty();
+            });
+
+            $("#btnModeElimination").on("click", function () {
+                gameMode = GameModes.ELIMINATION;
+                $("#sfxClick").prop("loop", false);
+                $('#sfxClick').prop("volume", volumenGlobal * volumenEfectos);
+                $("#sfxClick")[0].play();
+                chooseDifficulty();
+            });
+
+            $("#btnAtras").on("click", function () {
+                $("#sfxClick").prop("loop", false);
+                $('#sfxClick').prop("volume", volumenGlobal * volumenEfectos);
+                $("#sfxClick")[0].play();
+                menu();
+            });
+
+        }
+
+        function chooseDifficulty() {
+            $("#game-mode-menu").remove();
+            $("body").append("<div id='game-diff-menu'></div>");
+            $("#game-diff-menu").append("<img id='menu-principal-background' src='assets/menu-principal.jpg'>" +
+                                        "<img id='btnDiffNormal' class='btnOrder-1' src='assets/btn_normal.png'>" + 
+                                        "<img id='btnDiffHeroic' class='btnOrder-2' src='assets/btn_heroico.png'>" + 
+                                        "<img id='btnAtras' class='btnOrder-3' src='assets/btn_atras.png'>");
+
+            $("#btnDiffNormal").on("click", function () {
+                gameDifficulty = GameDifficulty.NORMAL;
+                $("#sfxClick").prop("loop", false);
+                $('#sfxClick').prop("volume", volumenGlobal * volumenEfectos);
+                $("#sfxClick")[0].play();
+                startGame();
+            });
+
+            $("#btnDiffHeroic").on("click", function () {
+                gameDifficulty = GameDifficulty.HEROIC;
+                $("#sfxClick").prop("loop", false);
+                $('#sfxClick').prop("volume", volumenGlobal * volumenEfectos);
+                $("#sfxClick")[0].play();
+                startGame();
+            });
+
+            $("#btnAtras").on("click", function () {
+                $("#sfxClick").prop("loop", false);
+                $('#sfxClick').prop("volume", volumenGlobal * volumenEfectos);
+                $("#sfxClick")[0].play();
+                chooseGameMode();
+            });
+
+        }
+
+        function menuOpciones() {
+            var canvas = $("#scene-section canvas:first-child");
+            $("#scene-section").css("display","none");
+            $("#pause-screen").css("display","none");
+            var h = canvas[0].height;
+            var w = canvas[0].width;
+            canvas[0].id = "canvas-game";
+            var hcss = $("#canvas-game").css("height");
+            var wcss = $("#canvas-game").css("width");
+
+            $("#options-screen").css("display","block");
+            $("#options-screen").height = h;
+            $("#options-screen").width = w;
+            $("#options-screen").css({"height" : hcss, "width" : wcss});
+
+            $("#sliderGeneralVolume").val(volumenGlobal);
+            $("#sliderMusicVolume").val(volumenMusica);
+            $("#sliderEffectsVolume").val(volumenEfectos);
+        }
+
+        function handleVolumes() {
+            
+            $("#sliderGeneralVolume").on("click", function () {
+                volumenGlobal = this.value;
+
+                $('#audioTheme').prop("volume", volumenGlobal * volumenMusica);
+
+                enemies.forEach(Enemy => {
+                    Enemy.sndPatrol.setVolume(volumenGlobal * volumenEfectos);
+                    Enemy.voices.forEach(EnemyVoice => {
+                        EnemyVoice.setVolume(volumenGlobal * volumenEfectos);
+                    });
+                });
+            });
+
+            $("#sliderMusicVolume").on("click", function () {
+                volumenMusica = this.value;
+                $('#audioTheme').prop("volume", volumenGlobal * volumenMusica);
+            });
+
+            $("#sliderEffectsVolume").on("click", function () {
+                volumenEfectos = this.value;
+
+                enemies.forEach(Enemy => {
+                    Enemy.sndPatrol.setVolume(volumenGlobal * volumenEfectos);
+                    Enemy.voices.forEach(EnemyVoice => {
+                        EnemyVoice.setVolume(volumenGlobal * volumenEfectos);
+                    });
+                });
+
+            });
+        }
+
+        function IsWorldReady() {
+            if (isWorldReady.length < worldObjects) {
+                return false
+            }
+            
+            return true;
+        }
+
+        function robotAI() {
+            enemies.forEach(Enemy => {
+                if(Enemy.nivel == currentLevel) {
+                    if (!Enemy.sndPatrol.isPlaying) {
+                        Enemy.sndPatrol.play();
+                    }
+                    //#region Voces Aleatorias
+
+                        var probVoice = 1000;
+                        var sndNumber = Math.floor(Math.random() * probVoice);
+
+                        if (sndNumber == probVoice-1) {
+                            var indexVoice = getRandomInt(0,Enemy.voices.length);
+                            Enemy.voices[indexVoice].play();
+                        }
+
+                    //#endregion
+
+                    var checkPlayers = [];
+
+                    Enemy.rotation.order = 'YXZ';
+                    const heading = Enemy.rotation.y;
+                    const radians = heading > 0 ? heading : 2 * Math.PI + heading;
+                    const degrees = THREE.Math.radToDeg(radians) - 90;
+
+                    var hray = 19;
+                    var sepRay = 12;
+
+                    var ray3Pos = new THREE.Vector3(Enemy.position.x, hray, Enemy.position.z);
+
+                    if (degrees < 35 && degrees > -35) {    // DERECHA
+
+                        var ray2Pos = new THREE.Vector3(Enemy.position.x, hray, Enemy.position.z-sepRay);
+                        var ray1Pos = new THREE.Vector3(Enemy.position.x, hray, Enemy.position.z+sepRay);
+                        
+
+                        rayCaster.set(ray1Pos, enemyRays[2]);
+                        var ray1Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray1Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        rayCaster.set(ray2Pos, enemyRays[2]);
+                        var ray2Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray2Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        rayCaster.set(ray3Pos, enemyRays[2]);
+                        var ray3Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray3Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        if (checkPlayers.length > 0) {
+                            checkPlayers.forEach(playerDetected => {
+                                if (playerDetected.distance < 50 && !playerDetected.object.parent.Invisible) {
+                                    playerDetected.object.parent.position.x = levels[currentLevel].position.x;
+                                    playerDetected.object.parent.position.y = levels[currentLevel].position.y;
+                                    playerDetected.object.parent.position.z = levels[currentLevel].position.z + 80;
+
+                                    playerDetected.object.parent.camera.position.x = playerDetected.object.parent.position.x;
+                                    playerDetected.object.parent.camera.position.y = playerDetected.object.parent.position.y + 120;
+                                    playerDetected.object.parent.camera.position.z = playerDetected.object.parent.position.z + 50;
+
+                                    $("#sfxCaught").prop("loop", false);
+                                    $('#sfxCaught').prop("volume", volumenGlobal * volumenEfectos);
+                                    $("#sfxCaught")[0].play();
+                
+                                }
+                            });
+                        }
+
+                    } else if (degrees < 125 && degrees > 55) { // ARRIBA
+
+                        var ray1Pos = new THREE.Vector3(Enemy.position.x+sepRay, hray, Enemy.position.z);
+                        var ray2Pos = new THREE.Vector3(Enemy.position.x-sepRay, hray, Enemy.position.z);
+
+                        rayCaster.set(ray1Pos, enemyRays[1]);
+                        var ray1Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray1Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        rayCaster.set(ray2Pos, enemyRays[1]);
+                        var ray2Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray2Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        rayCaster.set(ray3Pos, enemyRays[1]);
+                        var ray3Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray3Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        if (checkPlayers.length > 0) {
+                            checkPlayers.forEach(playerDetected => {
+                                if (playerDetected.distance < 50 && !playerDetected.object.parent.Invisible) {
+                                    playerDetected.object.parent.position.x = levels[currentLevel].position.x;
+                                    playerDetected.object.parent.position.y = levels[currentLevel].position.y;
+                                    playerDetected.object.parent.position.z = levels[currentLevel].position.z + 80;
+
+                                    playerDetected.object.parent.camera.position.x = playerDetected.object.parent.position.x;
+                                    playerDetected.object.parent.camera.position.y = playerDetected.object.parent.position.y + 120;
+                                    playerDetected.object.parent.camera.position.z = playerDetected.object.parent.position.z + 50;
+
+                                    $("#sfxCaught").prop("loop", false);
+                                    $('#sfxCaught').prop("volume", volumenGlobal * volumenEfectos);
+                                    $("#sfxCaught")[0].play();
+                                }
+                            });
+                        }
+
+                    } else if (degrees < 215 && degrees > 145) {    // IZQUIERDA
+
+                        var ray1Pos = new THREE.Vector3(Enemy.position.x, hray, Enemy.position.z+sepRay);
+                        var ray2Pos = new THREE.Vector3(Enemy.position.x, hray, Enemy.position.z-sepRay);
+
+                        rayCaster.set(ray1Pos, enemyRays[3]);
+                        var ray1Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray1Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        rayCaster.set(ray2Pos, enemyRays[3]);
+                        var ray2Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray2Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+                        
+                        rayCaster.set(ray3Pos, enemyRays[3]);
+                        var ray3Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray3Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        if (checkPlayers.length > 0) {
+                            checkPlayers.forEach(playerDetected => {
+                                if (playerDetected.distance < 50 && !playerDetected.object.parent.Invisible) {
+                                    playerDetected.object.parent.position.x = levels[currentLevel].position.x;
+                                    playerDetected.object.parent.position.y = levels[currentLevel].position.y;
+                                    playerDetected.object.parent.position.z = levels[currentLevel].position.z + 80;
+
+                                    playerDetected.object.parent.camera.position.x = playerDetected.object.parent.position.x;
+                                    playerDetected.object.parent.camera.position.y = playerDetected.object.parent.position.y + 120;
+                                    playerDetected.object.parent.camera.position.z = playerDetected.object.parent.position.z + 50;
+
+                                    $("#sfxCaught").prop("loop", false);
+                                    $('#sfxCaught').prop("volume", volumenGlobal * volumenEfectos);
+                                    $("#sfxCaught")[0].play();
+                                }
+                            });
+                        }
+
+                    } else if (degrees < 305 && degrees > 235) { // ABAJO
+
+                        var ray1Pos = new THREE.Vector3(Enemy.position.x+sepRay, hray, Enemy.position.z);
+                        var ray2Pos = new THREE.Vector3(Enemy.position.x-sepRay, hray, Enemy.position.z);
+
+                        rayCaster.set(ray1Pos, enemyRays[0]);
+                        var ray1Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray1Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        rayCaster.set(ray2Pos, enemyRays[0]);
+                        var ray2Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray2Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        rayCaster.set(ray3Pos, enemyRays[0]);
+                        var ray3Players = rayCaster.intersectObjects(players, true);
+                        ////scene.add(new THREE.ArrowHelper(rayCaster.ray.direction, rayCaster.ray.origin, 300, 0xff0000) );
+
+                        ray3Players.forEach(rayPlayer => {
+                            checkPlayers.push(rayPlayer);
+                        });
+
+                        if (checkPlayers.length > 0) {
+                            checkPlayers.forEach(playerDetected => {
+                                if (playerDetected.distance < 50 && !playerDetected.object.parent.Invisible) {
+                                    playerDetected.object.parent.position.x = levels[currentLevel].position.x;
+                                    playerDetected.object.parent.position.y = levels[currentLevel].position.y;
+                                    playerDetected.object.parent.position.z = levels[currentLevel].position.z + 80;
+
+                                    playerDetected.object.parent.camera.position.x = playerDetected.object.parent.position.x;
+                                    playerDetected.object.parent.camera.position.y = playerDetected.object.parent.position.y + 120;
+                                    playerDetected.object.parent.camera.position.z = playerDetected.object.parent.position.z + 50;
+
+                                    $("#sfxCaught").prop("loop", false);
+                                    $('#sfxCaught').prop("volume", volumenGlobal * volumenEfectos);
+                                    $("#sfxCaught")[0].play();
+                                }
+                            });
+                        }
+
+                    }
+
+                    switch(Enemy.state) {
+                        case enemyStates.WAIT: {
+
+                            if (Enemy.sleeping < Enemy.maxSleep) {
+                                Enemy.sleeping++;
+                            } else {
+                                Enemy.sleeping = 0;
+
+                                {
+                                    var rayPos = new THREE.Vector3(Enemy.position.x, Enemy.position.y + 5, Enemy.position.z);
+                                    rayCaster.set(rayPos, enemyRays[0]);
+
+                                    var checkAtras = rayCaster.intersectObjects(patrolPoints, true);
+                                        // Raycasting para las colisiones
+                                        //  Atrás
+                                    if (checkAtras.length > 0) {
+                                        if (checkAtras[0].object.name == "patrollPoint") {
+                                            Enemy.posNextLocations.push(checkAtras[0]);
+                                        }
+                                    }
+
+                                    rayCaster.set(rayPos, enemyRays[1]);
+
+                                    var checkAdelante = rayCaster.intersectObjects(patrolPoints, true);
+                                        // Raycasting para las colisiones
+                                        //  Atrás
+                                    if (checkAdelante.length > 0) {
+                                        if (checkAdelante[0].object.name == "patrollPoint") {
+                                            Enemy.posNextLocations.push(checkAdelante[0]);
+                                        }
+                                    }
+
+                                    rayCaster.set(rayPos, enemyRays[2]);
+
+                                    var checkDerecha = rayCaster.intersectObjects(patrolPoints, true);
+                                        // Raycasting para las colisiones
+                                        //  Atrás
+                                    if (checkDerecha.length > 0) {
+                                        if (checkDerecha[0].object.name == "patrollPoint") {
+                                            Enemy.posNextLocations.push(checkDerecha[0]);
+                                        }
+                                    }
+
+                                    rayCaster.set(rayPos, enemyRays[3]);
+
+                                    var checIzq = rayCaster.intersectObjects(patrolPoints, true);
+                                        // Raycasting para las colisiones
+                                        //  Atrás
+                                    if (checIzq.length > 0) {
+                                        if (checIzq[0].object.name == "patrollPoint") {
+                                            Enemy.posNextLocations.push(checIzq[0]);
+                                        }
+                                    }
+
+                                    Enemy.iNextLocation = Math.floor( Math.random() * Enemy.posNextLocations.length );
+
+                                }
+
+                                if (Enemy.posNextLocations.length > 0) {
+                                    Enemy.state = enemyStates.PATROL;
+                                }
+                            }
+
+                            break;
+                        }
+
+                        case enemyStates.PATROL: {
+
+                            var rayObj = Enemy.posNextLocations[Enemy.iNextLocation];
+                            var rayDist = getDistance(Enemy, rayObj.object);
+                            moveToPosition( Enemy, Enemy.robotSpd, rayObj.object);
+                            Enemy.lookAt(new THREE.Vector3(rayObj.object.position.x, Enemy.position.y, rayObj.object.position.z));
+                            if ( rayDist < 10 ) {
+                                Enemy.state = enemyStates.WAIT;
+                                Enemy.posNextLocations = [];
+                            }
+
+                            break;
+                        }
+                    }
+                } else {
+                    if (Enemy.sndPatrol.isPlaying) {
+                        Enemy.sndPatrol.pause();
+                    }
+                }
+                
+            });
+        }
+
+        function moveToPosition(object, speed, target) {
+
+            if (object.position.x > target.position.x) {
+                object.position.x -= speed;
+            } else if (object.position.x < target.position.x) {
+                object.position.x += speed;
+            }
+
+            if (object.position.z > target.position.z) {
+                object.position.z -= speed;
+            } else if (object.position.z < target.position.z) {
+                object.position.z += speed;
+            }
+
+        }
+
+        function getDistance(mesh1, mesh2) { 
+            var dx = mesh1.position.x - mesh2.position.x; 
+            var dy = mesh1.position.y - mesh2.position.y; 
+            var dz = mesh1.position.z - mesh2.position.z; 
+            return Math.sqrt(dx*dx+dy*dy+dz*dz); 
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+        function shareFB() {
+            //var score = $("#bar-label-points").val();
+            shareScore(Math.floor(currentUser.score), currentUser.username);
+        }
+        
+        function tablaPuntuaciones() {
+            //localStorage.setItem("Highscores", JSON.stringify(highscores));
+            //highscores = JSON.parse(localStorage.getItem("Highscores"));
+
+            if (!showingScore) {
+                $("#col-usernames").css("display","block");
+                $("#col-button").css("display","block");
+                $("#col-scores").css("display","block");
+                $("#div-get-user").remove();
+                var ins = false;
+                for (let index = 0; index < 10; index++) {
+                    if (highscores[index] != null && !ins) {
+                        if(currentUser.score > highscores[index].score) {
+                            highscores.splice(index, 0, currentUser);
+                            ins = true;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                if (!ins) {
+                    highscores.push(currentUser);
+                }
+                localStorage.setItem("Highscores", JSON.stringify(highscores));
+                highscores = JSON.parse(localStorage.getItem("Highscores"));
+
+                for (let index = 0; index < 10; index++) {
+                    if (highscores[index] != null) {
+                        $("#col-usernames").append("<p class='options-txt'>"+highscores[index].username+"</p>");
+                        $("#col-scores").append("<p class='options-txt'>"+Math.floor(highscores[index].score)+"</p>");
+                    } else {
+                        break;
+                    }
+                }
+
+                showingScore = true;
+            }
+
+        }
+
+    </script>
+</head>
+
+<body>
+    <div> <p id="player1-score"></p> </div>
+    <div> <p id="player2-score"></p> </div>
+    <div> <p id="player-zcoords"></p> </div>
+    
+    <div id="pause-screen" style="display:none"> <img src="assets/pause.png" id="pause-image"> 
+        <img id='btnOptions' class='btnOrder-4' src='assets/btn_options.png'> 
+    </div>
+    <div id="loading-screen" style="display:none"> <img src="assets/cargando.png" id="loading-image"> </div>
+
+    <div id="options-screen" style="background-image:url('assets/menu-principal.jpg'); background-repeat:no-repeat; background-size: cover; display: none;">
+        
+        <div class="container d-flex h-100 align-items-center">
+            <div class="row p-5 w-100">
+                <div class="col-4" style="text-align: center;">
+                    <p class="options-txt" style="display:inline-block;"> Master Volume </p>
+                    <input id="sliderGeneralVolume" type="range" min="0" max="1" step="0.1" class="range-3">
+                </div>
+
+                <div class="col-4" style="text-align: center;">
+                    <p class="options-txt" style="display:inline-block;"> Music Volume </p>
+                    <input id="sliderMusicVolume" type="range" min="0" max="0.1" step="0.01" class="range-3">
+                </div>
+
+                <div class="col-4" style="text-align: center;">
+                    <p class="options-txt" style="display:inline-block;"> Effects Volume </p>
+                    <input id="sliderEffectsVolume" type="range" min="0" max="1" step="0.1" class="range-3">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="score-screen" style="background-image:url('assets/menu-principal.jpg'); background-repeat:no-repeat; background-size: cover; display: none;">
+        
+        <div class="container d-flex h-100">
+
+            <div class="row p-5 w-100">
+                <div class="col-4 text-center" id="div-get-user">
+                    <p class="options-txt my-3" id="txt-winner"> </p>
+                    <p class="options-txt" id="txt-user-score"> Escribe tu usuario </p>
+                    <input class="options-txt my-3" id="user-score" type="text" placeholder="Usuario"> </input>
+                    <button class="btn-score" id="btn-send-score"> Enviar puntuacion </button>
+                </div>
+
+                <div class="col-4" id="col-usernames">
+                    <p class="options-txt"> User </p>
+                </div>
+
+                <div class="col-4" id="col-scores">
+                    <p class="options-txt"> Score </p>
+                </div>
+
+                <div class="col-4" id="col-button" style="align-self: end;">
+                    <img id="btn-share-fb" style="height: 20%;" src="assets/share.png" />
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    
+    <audio id="audioTheme" src="assets/musica.mp3"></audio>
+
+    <audio id="sfxStopTime" src="assets/stopTime2.wav"></audio>
+    <audio id="sfxIntangible" src="assets/Intangible.wav"></audio>
+    <audio id="sfxInvisible" src="assets/Invisible.wav"></audio>
+
+    <audio id="sfxCaught" src="assets/Caught.wav"></audio>
+    <audio id="sfxPickup" src="assets/PickUp.wav"></audio>
+    <audio id="sfxCooldown" src="assets/attackCooldouwn.wav"></audio>
+    <audio id="sfxClick" src="assets/Click.wav"></audio>
+    <audio id="sfxAttack" src="assets/attack1.mp3"></audio>
+
+    <div id="scene-section"></div>
+
+</body>
+
+</html>
